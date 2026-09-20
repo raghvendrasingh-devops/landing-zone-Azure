@@ -1,0 +1,67 @@
+name: terraform-pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - 'feature/**'
+
+
+
+jobs:
+  plan-phase:
+    runs-on: ubuntu-latest
+    steps:
+      
+      - name: checkout-code
+        uses: actions/checkout@v4
+
+      - name: terraform-installation & setup
+        uses: hashicorp/setup-terraform@v3
+
+      - name: terraform init task
+        run: terraform init
+
+      - name: terraform fmt task
+        run: terraform fmt
+
+      - name: terraform validate task
+        run: terraform validate 
+
+      - name: terraform plan task
+        run: terraform plan
+
+  
+
+  ### apply phase 
+
+  apply-phase:
+    needs: plan-phase
+    runs-on: ubuntu-latest
+    if: success() && github.ref == 'refs/heads/main'
+      steps:
+        
+        - name: checkout-code
+          uses: actions/checkout@v4
+
+        - name: terraform-installation & setup
+          uses: hashicorp/setup-terraform@v3
+
+        - name: terraform init task
+          run: terraform init
+
+        - name: terraform fmt task
+          run: terraform fmt
+
+        - name: terraform validate task
+          run: terraform validate 
+
+        - name: terraform plan task
+          run: terraform plan
+
+        - name: terraform apply task
+          run: terraform apply --auto-approve
+
+ 
+
+   
